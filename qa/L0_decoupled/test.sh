@@ -44,13 +44,16 @@ RET=0
 TEST_RESULT_FILE='test_results.txt'
 DECOUPLED_TEST=decoupled_test.py
 
-rm -f *.log
+LOG_DIR=${LOG_DIR:-"/logs"}
+mkdir -p ${LOG_DIR}
 
-CLIENT_LOG=`pwd`/client.log
+rm -f ${LOG_DIR}/*.log
+
+CLIENT_LOG=${LOG_DIR}/client.log
 DATADIR=/data/inferenceserver/${REPO_VERSION}/qa_model_repository
 SERVER=/opt/tritonserver/bin/tritonserver
 SERVER_ARGS="--model-repository=`pwd`/models"
-SERVER_LOG="./inference_server.log"
+SERVER_LOG="${LOG_DIR}/inference_server.log"
 source ../common/util.sh
 
 

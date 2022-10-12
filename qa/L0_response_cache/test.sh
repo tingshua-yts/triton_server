@@ -27,7 +27,10 @@
 
 RET=0
 
-TEST_LOG="./response_cache_test.log"
+LOG_DIR=${LOG_DIR:-"/logs"}
+mkdir -p ${LOG_DIR}
+
+TEST_LOG="${LOG_DIR}/response_cache_test.log"
 UNIT_TEST=./response_cache_test
 
 rm -fr *.log
@@ -50,7 +53,7 @@ mkdir -p "${PWD}/models/decoupled_cache/1"
 # cache enabled
 SERVER=/opt/tritonserver/bin/tritonserver
 SERVER_ARGS="--model-repository=${PWD}/models --response-cache-byte-size=8192"
-SERVER_LOG="./inference_server.log"
+SERVER_LOG="${LOG_DIR}/inference_server.log"
 source ../common/util.sh
 run_server
 if [ "$SERVER_PID" != "0" ]; then

@@ -40,6 +40,9 @@ fi
 
 export CUDA_VISIBLE_DEVICES=0
 
+LOG_DIR=${LOG_DIR:-"/logs"}
+mkdir -p ${LOG_DIR}
+
 CLIENT_LOG="./client.log"
 DATADIR=/data/inferenceserver/${REPO_VERSION}
 LC_TEST=lifecycle_test.py
@@ -64,7 +67,7 @@ function check_unit_test() {
 }
 
 RET=0
-rm -fr *.log
+rm -fr ${LOG_DIR}/*.log
 
 LOG_IDX=0
 
@@ -77,7 +80,7 @@ fi
 # LifeCycleTest.test_parse_error_noexit_strict
 SERVER_ARGS="--model-repository=/tmp/xyzx --strict-readiness=true \
              --exit-on-error=false"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server_nowait
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -100,7 +103,7 @@ LOG_IDX=$((LOG_IDX+1))
 # LifeCycleTest.test_parse_error_noexit
 SERVER_ARGS="--model-repository=/tmp/xyzx --strict-readiness=false \
              --exit-on-error=false"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server_nowait
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -126,7 +129,7 @@ rm -rf models
 mkdir models
 SERVER_ARGS="--model-repository=/tmp/xyzx --model-repository=`pwd`/models \
              --strict-readiness=true --exit-on-error=false"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server_nowait
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -152,7 +155,7 @@ rm -rf models
 mkdir models
 SERVER_ARGS="--model-repository=`pwd`/models --model-repository=/tmp/xyzx \
              --strict-readiness=false --exit-on-error=false"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server_nowait
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -186,7 +189,7 @@ if [ "$SERVER_PID" == "0" ]; then
 fi
 SAVED_SERVER_PID=$SERVER_PID
 SERVER_ARGS="--model-repository=`pwd`/models --http-port 8003 --metrics-port 8004"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 sleep $SLEEP_TIME
 # check server log for the warning messages
@@ -217,7 +220,7 @@ if [ "$SERVER_PID" == "0" ]; then
 fi
 SAVED_SERVER_PID=$SERVER_PID
 SERVER_ARGS="--model-repository=`pwd`/models --grpc-port 8003 --metrics-port 8004"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 sleep $SLEEP_TIME
 # check server log for the warning messages
@@ -249,7 +252,7 @@ if [ "$SERVER_PID" == "0" ]; then
 fi
 SAVED_SERVER_PID=$SERVER_PID
 SERVER_ARGS="--model-repository=`pwd`/models --grpc-port 8003 --http-port 8004"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 sleep $SLEEP_TIME
 # check server log for the warning messages
@@ -272,7 +275,7 @@ LOG_IDX=$((LOG_IDX+1))
 rm -rf models
 mkdir models
 SERVER_ARGS="--model-repository=`pwd`/models"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -302,7 +305,7 @@ LOG_IDX=$((LOG_IDX+1))
 rm -rf models
 mkdir models
 SERVER_ARGS="--model-repository=`pwd`/models"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -311,7 +314,7 @@ if [ "$SERVER_PID" == "0" ]; then
 fi
 
 LOG_IDX=$((LOG_IDX+1))
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 
 SAVED_SERVER_PID=$SERVER_PID
 SERVER_ARGS="--model-repository=`pwd`/models --grpc-port 8003 --http-port 8004 --metrics-port 8005"
@@ -345,7 +348,7 @@ rm models/graphdef_float32_float32_float32/3/*
 
 SERVER_ARGS="--model-repository=`pwd`/models --model-repository=`pwd`/models_0 \
              --exit-on-error=false --exit-timeout-secs=5"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server_tolive
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -370,7 +373,7 @@ LOG_IDX=$((LOG_IDX+1))
 # LifeCycleTest.test_parse_error_modelfail_nostrict
 SERVER_ARGS="--model-repository=`pwd`/models --model-repository=`pwd`/models_0 \
              --exit-on-error=false --exit-timeout-secs=5 --strict-readiness=false"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server_tolive
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -407,7 +410,7 @@ rm models/graphdef_float32_float32_float32/config.pbtxt
 # when in strict model configuration mode.
 SERVER_ARGS="--model-repository=`pwd`/models --model-repository=`pwd`/models_0 \
              --exit-on-error=false --exit-timeout-secs=5 --strict-model-config=true"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server_tolive
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -452,7 +455,7 @@ done
 
 SERVER_ARGS="--model-repository=`pwd`/models --model-repository=`pwd`/models_0 \
              --exit-on-error=false --exit-timeout-secs=5"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server_tolive
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -486,7 +489,7 @@ cp $DATADIR/qa_model_repository/graphdef_float32_float32_float32/config.pbtxt \
 
 SERVER_ARGS="--model-repository=`pwd`/models --exit-on-error=false \
              --exit-timeout-secs=5"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server_tolive
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -518,7 +521,7 @@ done
 
 SERVER_ARGS="--model-repository=`pwd`/models --exit-on-error=false \
              --exit-timeout-secs=5"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -553,7 +556,7 @@ done
 
 SERVER_ARGS="--model-repository=`pwd`/models --exit-on-error=false \
              --exit-timeout-secs=5"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -588,7 +591,7 @@ cp -r $DATADIR/qa_model_repository/savedmodel_float32_float32_float32 .
 
 SERVER_ARGS="--model-repository=`pwd`/models --repository-poll-secs=1 \
              --model-control-mode=poll --exit-timeout-secs=5"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -617,7 +620,7 @@ cp -r $DATADIR/qa_model_repository/savedmodel_float32_float32_float32 .
 
 SERVER_ARGS="--model-repository=`pwd`/models --model-control-mode=none \
              --exit-timeout-secs=5"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -645,7 +648,7 @@ done
 
 SERVER_ARGS="--model-repository=`pwd`/models --repository-poll-secs=1 \
              --model-control-mode=poll --exit-timeout-secs=5"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -674,7 +677,7 @@ done
 # Show model control mode will override deprecated model control options
 SERVER_ARGS="--model-repository=`pwd`/models --model-control-mode=none \
              --exit-timeout-secs=5"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -709,7 +712,7 @@ done
 
 SERVER_ARGS="--model-repository=`pwd`/models --repository-poll-secs=1 \
              --model-control-mode=poll --exit-timeout-secs=5"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -737,7 +740,7 @@ done
 
 SERVER_ARGS="--model-repository=`pwd`/models --repository-poll-secs=1 \
              --model-control-mode=poll --exit-timeout-secs=5 --strict-model-config=false"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -771,7 +774,7 @@ cp -r $DATADIR/qa_model_repository/savedmodel_float32_float32_float32 models/. &
 
 SERVER_ARGS="--model-repository=`pwd`/models --model-repository=`pwd`/models_0 \
              --model-control-mode=poll --repository-poll-secs=1 --exit-timeout-secs=5"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -807,7 +810,7 @@ cp -r $DATADIR/qa_model_repository/savedmodel_float32_float32_float32 models/. &
 SERVER_ARGS="--model-repository=`pwd`/models --model-repository=`pwd`/models_0 \
              --model-control-mode=explicit \
              --exit-timeout-secs=5"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -839,7 +842,7 @@ done
 SERVER_ARGS="--model-repository=`pwd`/models --model-control-mode=explicit \
              --exit-timeout-secs=5 --strict-model-config=false
              --strict-readiness=false"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -871,7 +874,7 @@ done
 SERVER_ARGS="--model-repository=`pwd`/models --model-control-mode=explicit \
              --exit-timeout-secs=5 --strict-model-config=false
              --strict-readiness=false"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -903,7 +906,7 @@ done
 SERVER_ARGS="--model-repository=`pwd`/models --model-control-mode=explicit \
              --exit-timeout-secs=5 --strict-model-config=false
              --strict-readiness=false"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -946,7 +949,7 @@ SERVER_ARGS="--model-repository=`pwd`/models --model-repository=`pwd`/models_0 \
              --load-model=savedmodel_float32_float32_float32 \
              --load-model=plan_float32_float32_float32 \
              --load-model=simple_onnx_float32_float32_float32"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -989,7 +992,7 @@ SERVER_ARGS="--model-repository=`pwd`/models --model-repository=`pwd`/models_0 \
              --strict-readiness=false \
              --strict-model-config=false --exit-on-error=false \
              --load-model=*"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -1025,7 +1028,7 @@ SERVER_ARGS="--model-repository=`pwd`/models --model-repository=`pwd`/models_0 \
              --exit-on-error=true \
              --load-model=* \
              --load-model=onnx_float32_float32_float32"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 if [ "$SERVER_PID" != "0" ]; then
     echo -e "\n***\n*** Failed: $SERVER started successfully when it was expected to fail\n***"
@@ -1046,7 +1049,7 @@ SERVER_ARGS="--model-repository=`pwd`/models \
              --strict-readiness=true \
              --exit-on-error=true \
              --load-model=${INVALID_MODEL}"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 if [ "$SERVER_PID" != "0" ]; then
     echo -e "\n***\n*** Failed: $SERVER started successfully when it was expected to fail\n***"
@@ -1082,7 +1085,7 @@ SERVER_ARGS="--model-repository=`pwd`/models --model-repository=`pwd`/models_0 \
              --load-model=onnx_float32_float32_float32 \
              --load-model=graphdef_float32_float32_float32 \
              --load-model=simple_savedmodel_float32_float32_float32"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -1114,7 +1117,7 @@ for protocol in grpc http; do
                  --exit-timeout-secs=5 --strict-model-config=false \
                  --load-model=identity_zero_1_int32 \
                  --strict-readiness=false"
-    SERVER_LOG="./inference_server_$LOG_IDX.log"
+    SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
     run_server
     if [ "$SERVER_PID" == "0" ]; then
         echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -1165,7 +1168,7 @@ for protocol in grpc http; do
                  --exit-timeout-secs=5 --strict-model-config=false \
                  --load-model=identity_zero_1_int32 \
                  --strict-readiness=false"
-    SERVER_LOG="./inference_server_$LOG_IDX.log"
+    SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
     run_server
     if [ "$SERVER_PID" == "0" ]; then
         echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -1216,7 +1219,7 @@ for protocol in grpc http; do
                  --exit-timeout-secs=5 --strict-model-config=false \
                  --load-model=identity_zero_1_int32 \
                  --strict-readiness=false"
-    SERVER_LOG="./inference_server_$LOG_IDX.log"
+    SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
     run_server
     if [ "$SERVER_PID" == "0" ]; then
         echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -1266,7 +1269,7 @@ SERVER_ARGS="--model-repository=`pwd`/models --model-control-mode=explicit \
              --exit-timeout-secs=5 --strict-model-config=false \
              --load-model=identity_zero_1_int32 \
              --strict-readiness=false"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -1308,7 +1311,7 @@ for protocol in grpc http; do
     SERVER_ARGS="--model-repository=`pwd`/models --model-control-mode=explicit \
                  --load-model=simple_float32_float32_float32 \
                  --exit-timeout-secs=5"
-    SERVER_LOG="./inference_server_$LOG_IDX.log"
+    SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
     run_server
     if [ "$SERVER_PID" == "0" ]; then
         echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -1353,7 +1356,7 @@ done
 SERVER_ARGS="--model-store=`pwd`/models --repository-poll-secs=0 \
              --exit-timeout-secs=5 --strict-model-config=false \
              --model-control-mode=poll"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -1415,7 +1418,7 @@ done
 
 SERVER_ARGS="--model-repository=`pwd`/models --model-control-mode=none \
              --exit-timeout-secs=5"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -1463,7 +1466,7 @@ rm models/onnx_float32_float32_float32/3/*
 SERVER_ARGS="--model-repository=`pwd`/models --model-repository=`pwd`/models \
              --model-control-mode=explicit \
              --strict-model-config=false"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -1496,7 +1499,7 @@ SERVER_ARGS="--model-repository=`pwd`/models \
              --model-control-mode=explicit \
              --load-model=onnx_float32_float32_float32 \
              --strict-model-config=false"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -1529,7 +1532,7 @@ cp -r ../custom_models/custom_zero_1_float32 models/. && \
         echo "]" >> config.pbtxt)
 
 SERVER_ARGS="--model-repository=`pwd`/models --log-verbose=1"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -1563,7 +1566,7 @@ cp -r ../custom_models/custom_sequence_int32 models/. && \
     mkdir -p models/custom_sequence_int32/1
 
 SERVER_ARGS="--model-repository=`pwd`/models --log-verbose=1"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -1608,7 +1611,7 @@ cp -r ../custom_models/custom_zero_1_float32 models/. && \
         echo "]" >> config.pbtxt)
 
 SERVER_ARGS="--model-repository=`pwd`/models --log-verbose=1"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"
@@ -1641,7 +1644,7 @@ cp -r ../python_models/cuda_memory_consumer models/cuda_memory_consumer_1 && \
 
 # Negative testing
 SERVER_ARGS="--model-repository=`pwd`/models --model-control-mode=explicit --model-load-gpu-limit -1:0.6"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 if [ "$SERVER_PID" != "0" ]; then
     echo -e "\n***\n*** unexpected start $SERVER\n***"
@@ -1655,7 +1658,7 @@ elif [ `grep -c "expects device ID >= 0, got -1" $SERVER_LOG` == "0" ]; then
 fi
 
 SERVER_ARGS="--model-repository=`pwd`/models --model-control-mode=explicit --model-load-gpu-limit 0:-0.4"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 if [ "$SERVER_PID" != "0" ]; then
     echo -e "\n***\n*** unexpected start $SERVER\n***"
@@ -1670,7 +1673,7 @@ fi
 
 # Run server to stop model loading if > 60% of GPU 0 memory is used
 SERVER_ARGS="--model-repository=`pwd`/models --model-control-mode=explicit --model-load-gpu-limit 0:0.6"
-SERVER_LOG="./inference_server_$LOG_IDX.log"
+SERVER_LOG="${LOG_DIR}/inference_server_$LOG_IDX.log"
 run_server
 if [ "$SERVER_PID" == "0" ]; then
     echo -e "\n***\n*** Failed to start $SERVER\n***"

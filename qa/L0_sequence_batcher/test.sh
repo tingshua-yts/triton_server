@@ -44,7 +44,10 @@ TEST_RESULT_FILE='test_results.txt'
 # can fail when the requests are distributed to multiple devices.
 export CUDA_VISIBLE_DEVICES=0
 
-CLIENT_LOG="./client.log"
+LOG_DIR=${LOG_DIR:-"/logs"}
+mkdir -p ${LOG_DIR}
+
+CLIENT_LOG="${LOG_DIR}/client.log"
 BATCHER_TEST=sequence_batcher_test.py
 
 if [ -z "$TEST_VALGRIND" ]; then
@@ -55,7 +58,7 @@ if [ "$TEST_VALGRIND" -eq 1 ]; then
     LEAKCHECK=/usr/bin/valgrind
     LEAKCHECK_ARGS_BASE="--leak-check=full --show-leak-kinds=definite --max-threads=3000"
     SERVER_TIMEOUT=3600
-    rm -f *.valgrind.log
+    rm -f ${LOG_DIR}/*.valgrind.log
 
     # Shortened tests due valgrind overhead
     MODEL_TRIALS="0 v"
@@ -157,7 +160,7 @@ export INITIAL_STATE_ZERO
 #   models1 - one instance with batch-size 4
 #   models2 - two instances with batch-size 2
 #   models4 - four instances with batch-size 1
-rm -fr *.log *.serverlog models{0,1,2,4} queue_delay_models && mkdir models{0,1,2,4} queue_delay_models
+rm -fr ${LOG_DIR}/*.log ${LOG_DIR}/*.serverlog models{0,1,2,4} queue_delay_models && mkdir models{0,1,2,4} queue_delay_models
 
 # Get the datatype to use based on the backend
 function get_datatype () {
@@ -473,10 +476,10 @@ for model_trial in $MODEL_TRIALS; do
 
     for i in $NO_DELAY_TESTS; do
         SERVER_ARGS="--model-repository=$MODELDIR/$MODEL_PATH ${SERVER_ARGS_EXTRA}"
-        SERVER_LOG="./$i.$MODEL_PATH.serverlog"
+        SERVER_LOG="${LOG_DIR}/$i.$MODEL_PATH.serverlog"
 
         if [ "$TEST_VALGRIND" -eq 1 ]; then
-            LEAKCHECK_LOG="./$i.$MODEL_PATH.valgrind.log"
+            LEAKCHECK_LOG="${LOG_DIR}/$i.$MODEL_PATH.valgrind.log"
             LEAKCHECK_ARGS="$LEAKCHECK_ARGS_BASE --log-file=$LEAKCHECK_LOG"
             run_server_leakcheck
         else
@@ -533,10 +536,10 @@ for model_trial in $MODEL_TRIALS; do
             [[ "$i" != "test_half_batch" ]] && export TRITONSERVER_DELAY_SCHEDULER=4 &&
             [[ "$i" != "test_backlog_sequence_timeout" ]] && export TRITONSERVER_DELAY_SCHEDULER=12
         SERVER_ARGS="--model-repository=$MODELDIR/$MODEL_PATH ${SERVER_ARGS_EXTRA}"
-        SERVER_LOG="./$i.$MODEL_PATH.serverlog"
+        SERVER_LOG="${LOG_DIR}/$i.$MODEL_PATH.serverlog"
 
         if [ "$TEST_VALGRIND" -eq 1 ]; then
-            LEAKCHECK_LOG="./$i.$MODEL_PATH.valgrind.log"
+            LEAKCHECK_LOG="${LOG_DIR}/$i.$MODEL_PATH.valgrind.log"
             LEAKCHECK_ARGS="$LEAKCHECK_ARGS_BASE --log-file=$LEAKCHECK_LOG"
             run_server_leakcheck
         else
@@ -603,10 +606,10 @@ if [[ $BACKENDS == *"custom"* ]]; then
     export TRITONSERVER_DELAY_SCHEDULER=12
 
     SERVER_ARGS="--model-repository=$MODELDIR/$MODEL_PATH ${SERVER_ARGS_EXTRA}"
-    SERVER_LOG="./$i.$MODEL_PATH.serverlog"
+    SERVER_LOG="${LOG_DIR}/$i.$MODEL_PATH.serverlog"
 
     if [ "$TEST_VALGRIND" -eq 1 ]; then
-      LEAKCHECK_LOG="./$i.$MODEL_PATH.valgrind.log"
+      LEAKCHECK_LOG="${LOG_DIR}/$i.$MODEL_PATH.valgrind.log"
       LEAKCHECK_ARGS="$LEAKCHECK_ARGS_BASE --log-file=$LEAKCHECK_LOG"
       run_server_leakcheck
     else
@@ -661,10 +664,10 @@ for i in $QUEUE_DELAY_TESTS ; do
     export TRITONSERVER_BACKLOG_DELAY_SCHEDULER=0
     export TRITONSERVER_DELAY_SCHEDULER=2
     SERVER_ARGS="--model-repository=$MODELDIR/$MODEL_PATH ${SERVER_ARGS_EXTRA}"
-    SERVER_LOG="./$i.$MODEL_PATH.serverlog"
+    SERVER_LOG="${LOG_DIR}/$i.$MODEL_PATH.serverlog"
 
     if [ "$TEST_VALGRIND" -eq 1 ]; then
-        LEAKCHECK_LOG="./$i.$MODEL_PATH.valgrind.log"
+        LEAKCHECK_LOG="${LOG_DIR}/$i.$MODEL_PATH.valgrind.log"
         LEAKCHECK_ARGS="$LEAKCHECK_ARGS_BASE --log-file=$LEAKCHECK_LOG"
         run_server_leakcheck
     else
