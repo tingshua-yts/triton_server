@@ -2990,14 +2990,20 @@ HTTPAPIServer::InferRequestClass::InferRequestComplete(
 {
   // FIXME need to manage the lifetime of InferRequestClass so that we
   // delete it here.
+  const char* request_id = "";
+  TRITONSERVER_InferenceRequestId(request, &request_id);
+  LOG_WARNING << "InferRequestComplete release callback called for request: " << request_id;
 
   if ((flags & TRITONSERVER_REQUEST_RELEASE_ALL) != 0) {
     if (userp != nullptr) {
       evbuffer_free(reinterpret_cast<evbuffer*>(userp));
     }
+    LOG_WARNING << "Calling InferenceRequestDelete in InferRequestComplete release callback for request: " << request_id;
     LOG_TRITONSERVER_ERROR(
         TRITONSERVER_InferenceRequestDelete(request),
         "deleting HTTP/REST inference request");
+  } else {
+    LOG_WARNING << "DID NOT call InferenceRequestDelete in InferRequestComplete release callback for request: " << request_id;
   }
 }
 
