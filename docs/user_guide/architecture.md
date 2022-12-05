@@ -213,43 +213,43 @@ sequence_batching {
 ```
 
 * **Start**: The start input tensor is specified using
-  CONTROL_SEQUENCE_START in the configuration. The example
+  CONTROL\_SEQUENCE\_START in the configuration. The example
   configuration indicates that the model has an input tensor called
   START with a 32-bit floating point data-type. The sequence batcher
   will define this tensor when executing an inference on the
   model. The START tensor must be 1-dimensional with size equal to the
   batch-size. Each element in the tensor indicates if the sequence in
   the corresponding batch slot is starting or not. In the example
-  configuration, fp32_false_true indicates that a sequence start is
+  configuration, fp32\_false\_true indicates that a sequence start is
   indicated by tensor element equal to 1, and non-start is indicated
   by tensor element equal to 0.
 
 * **End**: The end input tensor is specified using
-  CONTROL_SEQUENCE_END in the configuration. The example configuration
+  CONTROL\_SEQUENCE\_END in the configuration. The example configuration
   indicates that the model has an input tensor called END with a
   32-bit floating point data-type. The sequence batcher will define
   this tensor when executing an inference on the model. The END tensor
   must be 1-dimensional with size equal to the batch-size. Each
   element in the tensor indicates if the sequence in the corresponding
   batch slot is ending or not. In the example configuration,
-  fp32_false_true indicates that a sequence end is indicated by tensor
+  fp32\_false\_true indicates that a sequence end is indicated by tensor
   element equal to 1, and non-end is indicated by tensor element equal
   to 0.
 
 * **Ready**: The ready input tensor is specified using
-  CONTROL_SEQUENCE_READY in the configuration. The example
+  CONTROL\_SEQUENCE\_READY in the configuration. The example
   configuration indicates that the model has an input tensor called
   READY with a 32-bit floating point data-type. The sequence batcher
   will define this tensor when executing an inference on the
   model. The READY tensor must be 1-dimensional with size equal to the
   batch-size. Each element in the tensor indicates if the sequence in
   the corresponding batch slot has an inference request ready for
-  inference. In the example configuration, fp32_false_true indicates
+  inference. In the example configuration, fp32\_false\_true indicates
   that a sequence ready is indicated by tensor element equal to 1, and
   non-ready is indicated by tensor element equal to 0.
 
 * **Correlation ID**: The correlation ID input tensor is specified
-  using CONTROL_SEQUENCE_CORRID in the configuration. The example
+  using CONTROL\_SEQUENCE\_CORRID in the configuration. The example
   configuration indicates that the model has an input tensor called
   CORRID with a unsigned 64-bit integer data-type. The sequence
   batcher will define this tensor when executing an inference on the
@@ -279,7 +279,7 @@ sequence_batching {
 }
 ```
 
-The *state* section in the sequence_batching setting is used to indicate that
+The *state* section in the sequence\_batching setting is used to indicate that
 the model is using implicit state. The *input_name* field specifies the name of
 the input tensor that will contain the input state. The *output_name* field
 describes the name of the output tensor produced by the model that contains
@@ -297,8 +297,8 @@ output state from the client can increase the request latency because of the
 additional tensors that have to be transferred.
 
 Implicit state management requires backend support. Currently, only
-[onnxruntime_backend](https://github.com/triton-inference-server/onnxruntime_backend)
-and [tensorrt_backend](https://github.com/triton-inference-server/tensorrt_backend)
+[onnxruntime\_backend](https://github.com/triton-inference-server/onnxruntime_backend)
+and [tensorrt\_backend](https://github.com/triton-inference-server/tensorrt_backend)
 support implicit state.
 
 ##### State Initialization
@@ -536,11 +536,13 @@ all inference requests in a sequence are routed to the same model
 instance and then uses the [dynamic
 batcher](model_configuration.md#dynamic-batcher) to batch together
 multiple inferences from different sequences into a batch that
-inferences together.  With this strategy the model must typically use
-the CONTROL_SEQUENCE_CORRID control so that it knows which sequence
-each inference request in the batch belongs to. The
-CONTROL_SEQUENCE_READY control is typically not needed because all
-inferences in the batch will always be ready for inference.
+inferences together. With this strategy the model may need to use the
+CONTROL\_SEQUENCE\_CORRID control so that it knows which sequence each inference
+request in the batch belongs to. This is typically not required if the model is
+using [implicit state management](#implicit-state-management), since the
+sequence batcher will manage the state associated with each sequence. The
+CONTROL\_SEQUENCE\_READY control is typically not needed because all inferences
+in the batch will always be ready for inference.
 
 As an example of the sequence batcher using the Oldest scheduling
 strategy, assume a stateful model that has the following model
