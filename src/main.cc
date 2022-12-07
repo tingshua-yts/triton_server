@@ -1962,7 +1962,7 @@ Parse(TRITONSERVER_ServerOptions** server_options, int argc, char** argv)
 int
 main(int argc, char** argv)
 {
-  // Parse command-line to create the options for the inference
+  // 1）Parse command-line to create the options for the inference
   // server.
   TRITONSERVER_ServerOptions* server_options = nullptr;
   if (!Parse(&server_options, argc, argv)) {
@@ -1975,7 +1975,7 @@ main(int argc, char** argv)
   // Manager for shared memory blocks.
   auto shm_manager = std::make_shared<triton::server::SharedMemoryManager>();
 
-  // Create the server...
+  // 2）Create the server...
   TRITONSERVER_Server* server_ptr = nullptr;
   FAIL_IF_ERR(
       TRITONSERVER_ServerNew(&server_ptr, server_options), "creating server");
@@ -1986,24 +1986,24 @@ main(int argc, char** argv)
   std::shared_ptr<TRITONSERVER_Server> server(
       server_ptr, TRITONSERVER_ServerDelete);
 
-  // Configure and start tracing if specified on the command line.
+  // 3）Configure and start tracing if specified on the command line.
   if (!StartTracing(&trace_manager)) {
     exit(1);
   }
 
-  // Trap SIGINT and SIGTERM to allow server to exit gracefully
+  // 4）Trap SIGINT and SIGTERM to allow server to exit gracefully
   TRITONSERVER_Error* signal_err = triton::server::RegisterSignalHandler();
   if (signal_err != nullptr) {
     LOG_TRITONSERVER_ERROR(signal_err, "failed to register signal handler");
     exit(1);
   }
 
-  // Start the HTTP, GRPC, and metrics endpoints.
+  // 5）Start the HTTP, GRPC, and metrics endpoints.
   if (!StartEndpoints(server, trace_manager, shm_manager)) {
     exit(1);
   }
 
-  // Wait until a signal terminates the server...
+  // 6）Wait until a signal terminates the server...
   while (!triton::server::signal_exiting_) {
     // If enabled, poll the model repository to see if there have been
     // any changes.

@@ -2702,6 +2702,7 @@ HTTPAPIServer::HandleInfer(
 
     if (err == nullptr) {
       if (header_length != 0) {
+        // Extract individual input data from HTTP body and register in
         err = EVBufferToInput(
             model_name, irequest,
             (decompressed_buffer == nullptr) ? req->buffer_in
@@ -2716,6 +2717,9 @@ HTTPAPIServer::HandleInfer(
       }
     }
     if (err == nullptr) {
+      /// Set the release callback for an inference request. The release
+      /// callback is called by Triton to return ownership of the request
+      /// object.
       err = TRITONSERVER_InferenceRequestSetReleaseCallback(
           irequest, InferRequestClass::InferRequestComplete,
           decompressed_buffer);
@@ -3222,6 +3226,7 @@ HTTPAPIServer::Handle(evhtp_request_t* req)
     return;
   }
 
+  // 通过正在匹配解析出来kind的类型,并做处理
   std::string model_name, version, kind;
   if (RE2::FullMatch(
           std::string(req->uri->path->full), model_regex_, &model_name,
